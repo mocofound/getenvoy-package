@@ -12,7 +12,8 @@ if [[ `uname` != "Linux" || `uname -m` != "x86_64" ]]; then
 fi
 
 # Bazel magic.
-ROOT=$$(dirname $(rootpath boringssl/BUILDING.md))/..
+#ROOT=$$(dirname $(rootpath boringssl/BUILDING.md))/..
+ROOT=$(pwd)/..
 pushd $$ROOT
 
 # Build tools requirements:
