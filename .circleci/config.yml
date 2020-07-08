@@ -42,7 +42,15 @@ jobs:
       - run: ./ci/install-proto
       - run: ./ci/install-licenser
       - run: ./ci/proto
-
+  boringssl_fips:
+    resource_class: small
+    docker:
+      - image: circleci/golang:1.10.3
+        environment:
+          GO111MODULE: "on"
+    steps:
+      - checkout
+      - run: ./ci/boringssl_fips
 
  # build_mac:
  #   <<: *mac
@@ -108,6 +116,7 @@ workflows:
   version: 2
   all:
     jobs:
+      - boringssl_fips
       - proto
       - lint:
           requires:
