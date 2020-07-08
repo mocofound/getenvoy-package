@@ -14,12 +14,12 @@
 
 version: 2.0
 
-references:
-  mac: &mac
-    macos:
-      xcode: '11.1.0'
-    working_directory: ~/envoy-package
-    resource_class: large
+#references:
+#  mac: &mac
+#    macos:
+#      xcode: '11.1.0'
+#    working_directory: ~/envoy-package
+#    resource_class: large
 
 jobs:
   lint:
@@ -44,16 +44,16 @@ jobs:
       - run: ./ci/proto
 
 
-  build_mac:
-    <<: *mac
-    steps:
-      - checkout
-      - run: git status # to fix CircleCI spurious git error
-      - run: make push
-      - persist_to_workspace:
-          root: ~/envoy-package
-          paths:
-            - .
+ # build_mac:
+ #   <<: *mac
+ #   steps:
+ #     - checkout
+ #     - run: git status # to fix CircleCI spurious git error
+ #     - run: make push
+ #     - persist_to_workspace:
+ #         root: ~/envoy-package
+ #         paths:
+ #           - .
 
   build_and_test_linux:
     resource_class: small
@@ -71,13 +71,13 @@ jobs:
                 --project ${GOOGLE_PROJECT_ID} --substitutions _GIT_SHA=${CIRCLE_SHA1}
           no_output_timeout: 60m
 
-  release_mac:
-    <<: *mac
-    steps:
-      - attach_workspace:
-          at: ~/envoy-package
-      - run: git status # to fix CircleCI spurious git error
-      - run: make release
+  #release_mac:
+  #  <<: *mac
+  #  steps:
+  #    - attach_workspace:
+  #        at: ~/envoy-package
+  #    - run: git status # to fix CircleCI spurious git error
+  #    - run: make release
 
   release_linux:
     resource_class: small
@@ -93,15 +93,15 @@ jobs:
           gcloud container images add-tag gcr.io/getenvoy-package/rbe-linux-glibc:$CIRCLE_SHA1 \
                                           gcr.io/getenvoy-package/rbe-linux-glibc:latest --quiet
 
-  test_envoy_build_mac:
-    <<: *mac
-    environment:
-      ENVOY_DIST: darwin
-    steps:
-      - checkout
-      - run: git status # to fix CircleCI spurious git error
-      - run: ./envoy_pkg/build_context.py --download --tag $CIRCLE_SHA1
-      - run: /usr/local/opt/envoy_pkg/package_envoy.py --test_package
+  #test_envoy_build_mac:
+  #  <<: *mac
+  #  environment:
+  #    ENVOY_DIST: darwin
+  #  steps:
+  #    - checkout
+  #    - run: git status # to fix CircleCI spurious git error
+  #    - run: ./envoy_pkg/build_context.py --download --tag $CIRCLE_SHA1
+  #    - run: /usr/local/opt/envoy_pkg/package_envoy.py --test_package
 
 
 workflows:
@@ -115,19 +115,19 @@ workflows:
       - build_and_test_linux:
           requires:
             - lint
-      - build_mac:
-          requires:
-            - lint
-      - test_envoy_build_mac:
-          requires:
-            - build_mac
-      - release_mac:
-          requires:
-            - test_envoy_build_mac
-          filters:
-            branches:
-              only:
-                - master
+#      - build_mac:
+#          requires:
+#             - lint
+#      - test_envoy_build_mac:
+#          requires:
+#            - build_mac
+#      - release_mac:
+#          requires:
+#            - test_envoy_build_mac
+#          filters:
+#            branches:
+#              only:
+#                - master
       - release_linux:
           requires:
             - build_and_test_linux
